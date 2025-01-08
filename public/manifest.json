@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "extension",
-  "description": "Transformers.js | Sample browser extension",
+  "name": "ClueHunter - Perplexity",
+  "description": "Find the evidence from the perplexity answer. Fully local and web-based extension. No server required.",
   "version": "0.0.1",
   "permissions": [
     "activeTab",
@@ -31,7 +31,7 @@
       "24": "icons/icon.png",
       "32": "icons/icon.png"
     },
-    "default_title": "Transformers.js",
+    "default_title": "ClueHunter Perplexity",
     "default_popup": "popup.html"
   },
   "content_security_policy": {
