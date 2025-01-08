@@ -30,12 +30,8 @@ function perplexity_main() {
 
 function extractPerplexityContent() {
     try {
-        // Extract question/prompt
-        const firstQuestionNode = document.querySelector('h1.text-3xl.font-display');
-        const firstQuestion = firstQuestionNode ? firstQuestionNode.textContent.trim() : '';
-        const nextQuestionsNode = document.querySelectorAll('div.text-3xl.font-display');
-        const nextQuestionElems = Array.from(nextQuestionsNode).map(elem => elem.textContent.trim());
-        const questionList = [firstQuestion, ...nextQuestionElems];
+        // Extract all questions in perplexity
+        const questionList = extractQuestionList(document);
 
         // Extract answer
         const answerElement = document.querySelector('[class*="markdown prose"]');
@@ -64,6 +60,11 @@ function extractPerplexityContent() {
     }
 }
 
-function extractQuery() {
-
+function extractQuestionList(doc) {
+    const firstQuestionNode = doc.querySelector('h1.text-3xl.font-display');
+    const firstQuestion = firstQuestionNode ? firstQuestionNode.textContent.trim() : '';
+    const nextQuestionsNode = doc.querySelectorAll('div.text-3xl.font-display');
+    const nextQuestionElems = Array.from(nextQuestionsNode).map(elem => elem.textContent.trim());
+    const questionList = [firstQuestion, ...nextQuestionElems];
+    return questionList;
 }
