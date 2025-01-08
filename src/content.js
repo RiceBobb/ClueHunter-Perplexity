@@ -30,8 +30,9 @@ function perplexity_main() {
 
 function extractPerplexityContent() {
     try {
-        // Extract all questions in perplexity
-        const questionList = extractQuestionList(document);
+        const conversationNodes = getConversationNodes(document);
+        const dataList = conversationNodes.map(extractData);
+        console.log("Perplexity data:", dataList);
 
         // Extract answer
         const answerElement = document.querySelector('[class*="markdown prose"]');
@@ -48,8 +49,6 @@ function extractPerplexityContent() {
             timestamp: new Date().toISOString()
         };
 
-        console.log('Extracted Perplexity content:', content);
-
         // Optional: Send to background script
         chrome.runtime.sendMessage({
             action: 'saveContent',
@@ -60,11 +59,74 @@ function extractPerplexityContent() {
     }
 }
 
-function extractQuestionList(doc) {
-    const firstQuestionNode = doc.querySelector('h1.text-3xl.font-display');
-    const firstQuestion = firstQuestionNode ? firstQuestionNode.textContent.trim() : '';
-    const nextQuestionsNode = doc.querySelectorAll('div.text-3xl.font-display');
-    const nextQuestionElems = Array.from(nextQuestionsNode).map(elem => elem.textContent.trim());
-    const questionList = [firstQuestion, ...nextQuestionElems];
-    return questionList;
+function extractData(node) {
+    const question = extractQuestion(node);
+
+    return {
+        'question': question,
+        'answer_citations': extractAnswerCitations(node)
+    }
+}
+
+function extractQuestion(node) {
+    const firstQuestionNode = node.querySelector('h1.text-3xl.font-display');
+    if (firstQuestionNode) {
+        return firstQuestionNode.textContent.trim();
+    }
+    const nextQuestionNode = node.querySelector('div.text-3xl.font-display');
+    if (!nextQuestionNode) {
+        console.error('No question found in node:', node);
+        return;
+    }
+    return nextQuestionNode.textContent.trim();
+}
+
+function getConversationNodes(doc) {
+    // Pass DOM document as input.
+    // Returns list of conversation nodes.
+    const nodeList = doc.querySelectorAll('.pb-lg.border-borderMain\\/50.ring-borderMain\\/50.divide-borderMain\\/50.dark\\:divide-borderMainDark\\/50.dark\\:ring-borderMainDark\\/50.dark\\:border-borderMainDark\\/50.bg-transparent');
+    return Array.from(nodeList);
+}
+
+function extractAnswerCitations(node) {
+    const selector = '.prose.dark\\:prose-invert.inline.leading-normal.break-words.min-w-0.\\[word-break\\:break-word\\]';
+    const answerCitationNode = node.querySelector(selector); // Contains all answer and citations under this question
+    const spanNodes = Array.from(answerCitationNode.querySelectorAll('span'));
+    const extractedSpans = spanNodes.map(extractSpan).filter(span => span !== null);
+    return extractedSpans;
+}
+
+const spanTypes = Object.freeze({
+    SENTENCE: 'SENTENCE',
+    CITATION: 'CITATION',
+    OTHER: 'OTHER',
+
+    // Helper method to check if value is valid
+    isValid(value) {
+        return Object.values(this).includes(value);
+    },
+
+    // Get all values
+    values() {
+        return Object.values(this).filter(value => typeof value !== 'function');
+    }
+});
+
+function extractSpan(spanNode) {
+    const extractedText = spanNode.textContent.trim();
+    if (spanNode.childElementCount === 0) {
+        if (extractedText.length >= 4) {
+            return spanTypes.SENTENCE, extractedText;
+        }
+    }
+    if (hasDirectAnchorChild(spanNode)) {
+        const citationLink = spanNode.querySelector('a').getAttribute('href');
+        return spanTypes.CITATION, citationLink;
+    }
+    return spanTypes.OTHER, null;
+}
+
+function hasDirectAnchorChild(node) {
+    const firstElement = Array.from(node.children)[0];
+    return firstElement && firstElement.tagName.toLowerCase() === 'a';
 }
