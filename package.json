@@ -1,0 +1,21 @@
+{
+  "name": "cluehunter-perplexity",
+  "version": "0.0.1",
+  "description": "Find the evidence from the perplexity answer. Fully local and web-based extension. No server required.",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack --watch"
+  },
+  "type": "module",
+  "author": "Rice-Bobb-Foundation",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "html-webpack-plugin": "^5.5.1",
+    "webpack": "^5.79.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@xenova/transformers": "^2.0.0"
+  }
+}
