@@ -92,8 +92,23 @@ function extractAnswerCitations(node) {
     const selector = '.prose.dark\\:prose-invert.inline.leading-normal.break-words.min-w-0.\\[word-break\\:break-word\\]';
     const answerCitationNode = node.querySelector(selector); // Contains all answer and citations under this question
     const spanNodes = Array.from(answerCitationNode.querySelectorAll('span'));
-    const extractedSpans = spanNodes.map(extractSpan).filter(span => span !== null);
-    return extractedSpans;
+    const extractedSpans = spanNodes.map(extractSpan).filter(span => span.value !== null);
+    // Now need to make an answer-citation pairs
+    let currentIdx = -1;
+    let answerCitationPairs = [];
+    for (let i = 0; i < extractedSpans.length; i++) {
+        if (extractedSpans[i].type === spanTypes.SENTENCE && extractedSpans[i+1].type === spanTypes.CITATION) {
+            currentIdx++;
+            answerCitationPairs[currentIdx] = {
+                'answer': extractedSpans[i].value,
+                'citation': []
+            }
+        }
+        if (extractedSpans[i].type === spanTypes.CITATION) {
+            answerCitationPairs[currentIdx].citation.push(extractedSpans[i].value);
+        }
+    }
+    return answerCitationPairs;
 }
 
 const spanTypes = Object.freeze({
@@ -116,14 +131,14 @@ function extractSpan(spanNode) {
     const extractedText = spanNode.textContent.trim();
     if (spanNode.childElementCount === 0) {
         if (extractedText.length >= 4) {
-            return spanTypes.SENTENCE, extractedText;
+            return { type: spanTypes.SENTENCE, value: extractedText };
         }
     }
     if (hasDirectAnchorChild(spanNode)) {
         const citationLink = spanNode.querySelector('a').getAttribute('href');
-        return spanTypes.CITATION, citationLink;
+        return { type: spanTypes.CITATION, value: citationLink };
     }
-    return spanTypes.OTHER, null;
+    return { type: spanTypes.OTHER, value: null };
 }
 
 function hasDirectAnchorChild(node) {
