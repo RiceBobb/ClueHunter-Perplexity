@@ -28,6 +28,7 @@ function handleClick(event) {
     },
     xpath: getXPath(clickedElement),
     url: window.location.href,
+    isCitation: isCitation(clickedElement),
   };
 
   // Send to background script
@@ -35,6 +36,11 @@ function handleClick(event) {
     action: "elementClicked",
     data: elementInfo,
   });
+}
+
+function isCitation(element) {
+    const possibleAnchorTag = element.parentNode.parentNode;
+    return possibleAnchorTag.tagName.toLowerCase() === "a" && possibleAnchorTag.classList && possibleAnchorTag.classList.contains("citation");
 }
 
 function getXPath(element) {
