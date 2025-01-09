@@ -8,6 +8,11 @@ function isPerplexity(url) {
     return url.startsWith('https://www.perplexity.ai/search');
 }
 
+function getSessionName(url) {
+    const urlParts = url.split('/');
+    return urlParts[urlParts.length - 1];
+}
+
 function perplexity_main() {
     // Set up mutation observer to track dynamic content
     const observer = new MutationObserver((mutations) => {
@@ -34,25 +39,11 @@ function extractPerplexityContent() {
         const dataList = conversationNodes.map(extractData);
         console.log("Perplexity data:", dataList);
 
-        // Extract answer
-        const answerElement = document.querySelector('[class*="markdown prose"]');
-        const answer = answerElement ? answerElement.textContent.trim() : '';
-
-        // Extract sources if available
-        const sources = Array.from(document.querySelectorAll('[class*="cite-source"]'))
-            .map(source => source.textContent.trim());
-
-        const content = {
-            questionList,
-            answer,
-            sources,
-            timestamp: new Date().toISOString()
-        };
-
         // Optional: Send to background script
         chrome.runtime.sendMessage({
             action: 'saveContent',
-            content: content
+            session: getSessionName(window.location.href),
+            content: dataList
         });
     } catch (error) {
         console.error('Error extracting content:', error);
