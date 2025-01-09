@@ -9,7 +9,11 @@
     "contextMenus",
     "storage",
     "unlimitedStorage",
-    "tabs"
+    "tabs",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "*://*.perplexity.ai/*"
   ],
   "background": {
     "service_worker": "background.js",

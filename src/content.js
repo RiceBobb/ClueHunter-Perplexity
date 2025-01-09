@@ -13,21 +13,27 @@ function getSessionName(url) {
   return urlParts[urlParts.length - 1];
 }
 
-function perplexity_main() {
-  // Set up mutation observer to track dynamic content
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.addedNodes.length) {
-        extractPerplexityContent();
-      }
-    });
-  });
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "runPerplexityMain") {
+        perplexity_main();
+    }
+});
 
-  // Start observing the main content area
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+function perplexity_main() {
+//   // Set up mutation observer to track dynamic content
+//   const observer = new MutationObserver((mutations) => {
+//     mutations.forEach((mutation) => {
+//       if (mutation.addedNodes.length) {
+//         extractPerplexityContent();
+//       }
+//     });
+//   });
+
+//   // Start observing the main content area
+//   observer.observe(document.body, {
+//     childList: true,
+//     subtree: true,
+//   });
 
   // Initial content extraction
   extractPerplexityContent();
