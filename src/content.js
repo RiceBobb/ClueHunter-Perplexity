@@ -1,5 +1,5 @@
 if (isPerplexity(window.location.href)) {
-  perplexity_main();
+  document.addEventListener("click", handleClick, true);
 } else {
   console.log(document.body.innerText); // Parsing
 }
@@ -20,10 +20,13 @@ function handleClick(event) {
     // When the element is Citation, we need to extract the answer and citation
     const tempSpan = clickedElement.parentNode.parentNode.parentNode;
     let initialCitationSpan;
-    if (tempSpan.classList && tempSpan.classList.contains("whitespace-nowrap")) {
-        initialCitationSpan = tempSpan.parentNode;
+    if (
+      tempSpan.classList &&
+      tempSpan.classList.contains("whitespace-nowrap")
+    ) {
+      initialCitationSpan = tempSpan.parentNode;
     } else {
-        initialCitationSpan = tempSpan;
+      initialCitationSpan = tempSpan;
     }
     console.log("Initial Citation Span:", initialCitationSpan);
     let i = -1;
@@ -52,7 +55,7 @@ function handleClick(event) {
     xpath: getXPath(clickedElement),
     url: window.location.href,
     isCitation: isCitation(clickedElement),
-    answer: answer
+    answer: answer,
   };
 
   // Send to background script
@@ -124,7 +127,7 @@ function getNthSibling(element, n) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "runPerplexityMain") {
-    perplexity_main();
+    // perplexity_main();
   }
 });
 
