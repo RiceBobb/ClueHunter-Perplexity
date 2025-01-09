@@ -15,11 +15,34 @@ function getSessionName(url) {
 
 function handleClick(event) {
   const clickedElement = event.target;
+  let answer = "";
+  if (isCitation(clickedElement)) {
+    // When the element is Citation, we need to extract the answer and citation
+    const tempSpan = clickedElement.parentNode.parentNode.parentNode;
+    let initialCitationSpan;
+    if (tempSpan.classList && tempSpan.classList.contains("whitespace-nowrap")) {
+        initialCitationSpan = tempSpan.parentNode;
+    } else {
+        initialCitationSpan = tempSpan;
+    }
+    console.log("Initial Citation Span:", initialCitationSpan);
+    let i = -1;
+    while (true) {
+      const previousSibling = getNthSibling(initialCitationSpan, i);
+      const extractedResult = extractSpan(previousSibling);
+      if (extractedResult.type === spanTypes.SENTENCE) {
+        answer = extractedResult.value;
+        break;
+      }
+      i--;
+    }
+  }
 
   // Get element details
   const elementInfo = {
     tag: clickedElement.tagName,
     text: clickedElement.textContent,
+    href: getHref(clickedElement),
     coordinates: {
       x: event.clientX,
       y: event.clientY,
@@ -29,6 +52,7 @@ function handleClick(event) {
     xpath: getXPath(clickedElement),
     url: window.location.href,
     isCitation: isCitation(clickedElement),
+    answer: answer
   };
 
   // Send to background script
@@ -39,8 +63,19 @@ function handleClick(event) {
 }
 
 function isCitation(element) {
-    const possibleAnchorTag = element.parentNode.parentNode;
-    return possibleAnchorTag.tagName.toLowerCase() === "a" && possibleAnchorTag.classList && possibleAnchorTag.classList.contains("citation");
+  const possibleAnchorTag = element.parentNode.parentNode;
+  return (
+    possibleAnchorTag.tagName.toLowerCase() === "a" &&
+    possibleAnchorTag.classList &&
+    possibleAnchorTag.classList.contains("citation")
+  );
+}
+
+function getHref(element) {
+  if (isCitation(element)) {
+    return element.parentNode.parentNode.href;
+  }
+  return element.href;
 }
 
 function getXPath(element) {
@@ -70,6 +105,21 @@ function getXPath(element) {
       ix++;
     }
   }
+}
+
+function getNthSibling(element, n) {
+  if (!element || n === 0) return element;
+
+  let current = element;
+  let count = Math.abs(n);
+
+  while (current && count > 0) {
+    current =
+      n > 0 ? current.nextElementSibling : current.previousElementSibling;
+    count--;
+  }
+
+  return current;
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -118,25 +168,9 @@ function extractPerplexityContent() {
 }
 
 function extractData(node) {
-  const question = extractQuestion(node);
-
   return {
-    question: question,
     answer_citations: extractAnswerCitations(node),
   };
-}
-
-function extractQuestion(node) {
-  const firstQuestionNode = node.querySelector("h1.text-3xl.font-display");
-  if (firstQuestionNode) {
-    return firstQuestionNode.textContent.trim();
-  }
-  const nextQuestionNode = node.querySelector("div.text-3xl.font-display");
-  if (!nextQuestionNode) {
-    console.error("No question found in node:", node);
-    return;
-  }
-  return nextQuestionNode.textContent.trim();
 }
 
 function getConversationNodes(doc) {
