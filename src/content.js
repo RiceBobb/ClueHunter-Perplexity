@@ -2,7 +2,10 @@ if (isPerplexity(window.location.href)) {
   perplexity_main();
 } else {
   console.log(document.body.innerText); // Parsing
-  highlightText("청소년 대표팀 시절부터 유망주로 주목받았으며, U리그를 대표하는 골키퍼로서 고려대학교에서 오랫동안 주전 골키퍼로 뛰어난 활약을 했다."); // Highlighting
+
+  const searchText = "청소년 대표팀 시절부터 유망주로 주목받았으며, U리그를 대표하는 골키퍼로서 고려대학교에서 오랫동안 주전 골키퍼로 뛰어난 활약을 했다.";
+  const range = highlightText(searchText);
+  scrollToRange(range);
 }
 
 function isPerplexity(url) {
@@ -157,5 +160,15 @@ function highlightText(searchText) {
       sel.collapseToEnd();
     }
     document.designMode = "off";
+  }
+}
+
+function scrollToRange(range) {
+  if (range) {
+    const rect = range.getBoundingClientRect();
+    window.scrollTo({
+      top: rect.top + window.pageYOffset - 100,
+      behavior: 'smooth'
+    });
   }
 }
