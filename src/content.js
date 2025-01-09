@@ -5,15 +5,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-if (isPerplexity(window.location.href)) {
-  document.addEventListener("click", handleClick, true);
-} else {
-  chrome.runtime.sendMessage({
+chrome.runtime.sendMessage({
     action: "webPageLoaded",
     data: window.location.href,
   });
-  console.log(document.body.innerText); // Parsing
-}
+
+document.addEventListener("click", handleClick, true);
+
+//   console.log(document.body.innerText); // Parsing
 
 function isPerplexity(url) {
   return url.startsWith("https://www.perplexity.ai/search");
@@ -25,6 +24,7 @@ function getSessionName(url) {
 }
 
 function handleClick(event) {
+  if (isPerplexity(window.location.href)) {
   const clickedElement = event.target;
   let answer = "";
   if (isCitation(clickedElement)) {
@@ -74,6 +74,7 @@ function handleClick(event) {
     action: "elementClicked",
     data: elementInfo,
   });
+}
 }
 
 function isCitation(element) {
