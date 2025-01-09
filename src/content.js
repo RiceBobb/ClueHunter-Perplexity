@@ -53,7 +53,7 @@ function handleClick(event) {
       pageY: event.pageY,
     },
     xpath: getXPath(clickedElement),
-    url: window.location.href,
+    currentUrl: window.location.href,
     isCitation: isCitation(clickedElement),
     answer: answer,
   };
@@ -124,6 +124,8 @@ function getNthSibling(element, n) {
 
   return current;
 }
+
+// TODO: Implement the listener when there is a corresponding 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "runPerplexityMain") {

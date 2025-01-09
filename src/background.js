@@ -22,6 +22,15 @@ chrome.webRequest.onCompleted.addListener(
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'elementClicked') {
     console.log('Element clicked:', message.data);
-    // Handle the click data as needed
+    
+    if (message.data.isCitation) {
+      console.log('Citation clicked:', message.data.answer);
+      chrome.storage.local.set({
+        'perplexity_cluehunter_recent': {
+          url: message.data.href,
+          answer: message.data.answer
+        }
+      });
+    }
   }
 });
