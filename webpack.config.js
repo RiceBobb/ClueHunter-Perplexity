@@ -13,6 +13,7 @@ const config = {
         background: './src/background.js',
         popup: './src/popup.js',
         content: './src/content.js',
+        options: './src/options.js',
     },
     output: {
         path: path.resolve(__dirname, 'build'),
@@ -22,6 +23,10 @@ const config = {
         new HtmlWebpackPlugin({
             template: './src/popup.html',
             filename: 'popup.html',
+        }),
+        new HtmlWebpackPlugin({
+            template: './src/options.html',
+            filename: 'options.html',
         }),
         new CopyPlugin({
             patterns: [
