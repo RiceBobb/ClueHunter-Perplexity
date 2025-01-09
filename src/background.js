@@ -18,3 +18,10 @@ chrome.webRequest.onCompleted.addListener(
   }, 
   {urls: ['*://*.perplexity.ai/rest/thread/*']},
 );
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'elementClicked') {
+    console.log('Element clicked:', message.data);
+    // Handle the click data as needed
+  }
+});

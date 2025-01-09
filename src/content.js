@@ -13,27 +13,82 @@ function getSessionName(url) {
   return urlParts[urlParts.length - 1];
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "runPerplexityMain") {
-        perplexity_main();
+function handleClick(event) {
+  const clickedElement = event.target;
+
+  // Get element details
+  const elementInfo = {
+    tag: clickedElement.tagName,
+    text: clickedElement.textContent,
+    coordinates: {
+      x: event.clientX,
+      y: event.clientY,
+      pageX: event.pageX,
+      pageY: event.pageY,
+    },
+    xpath: getXPath(clickedElement),
+    url: window.location.href,
+  };
+
+  // Send to background script
+  chrome.runtime.sendMessage({
+    action: "elementClicked",
+    data: elementInfo,
+  });
+}
+
+function getXPath(element) {
+  if (element.id !== "") {
+    return `//*[@id="${element.id}"]`;
+  }
+  if (element === document.body) {
+    return "/html/body";
+  }
+
+  let ix = 0;
+  const siblings = element.parentNode.childNodes;
+
+  for (let i = 0; i < siblings.length; i++) {
+    const sibling = siblings[i];
+    if (sibling === element) {
+      return (
+        getXPath(element.parentNode) +
+        "/" +
+        element.tagName.toLowerCase() +
+        "[" +
+        (ix + 1) +
+        "]"
+      );
     }
+    if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+      ix++;
+    }
+  }
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "runPerplexityMain") {
+    perplexity_main();
+  }
 });
 
 function perplexity_main() {
-//   // Set up mutation observer to track dynamic content
-//   const observer = new MutationObserver((mutations) => {
-//     mutations.forEach((mutation) => {
-//       if (mutation.addedNodes.length) {
-//         extractPerplexityContent();
-//       }
-//     });
-//   });
+  //   // Set up mutation observer to track dynamic content
+  //   const observer = new MutationObserver((mutations) => {
+  //     mutations.forEach((mutation) => {
+  //       if (mutation.addedNodes.length) {
+  //         extractPerplexityContent();
+  //       }
+  //     });
+  //   });
 
-//   // Start observing the main content area
-//   observer.observe(document.body, {
-//     childList: true,
-//     subtree: true,
-//   });
+  //   // Start observing the main content area
+  //   observer.observe(document.body, {
+  //     childList: true,
+  //     subtree: true,
+  //   });
+
+  document.addEventListener("click", handleClick, true);
 
   // Initial content extraction
   extractPerplexityContent();
