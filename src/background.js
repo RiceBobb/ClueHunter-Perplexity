@@ -1,9 +1,9 @@
 import { clueHunt } from "@rice-bobb/cluehunter";
-// import { env } from "@xenova/transformers";
+import { env } from "@huggingface/transformers";
 
 // Due to a bug in onnxruntime-web, we must disable multithreading for now.
 // See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
-// env.backends.onnx.wasm.numThreads = 1;
+env.backends.onnx.wasm.numThreads = 1;
 
 chrome.webRequest.onCompleted.addListener(
   (details) => {
