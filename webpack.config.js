@@ -19,6 +19,11 @@ const config = {
         path: path.resolve(__dirname, 'build'),
         filename: '[name].js',
     },
+    resolve: {
+        alias: {
+            '@huggingface/transformers': path.resolve(__dirname, 'node_modules/@huggingface/transformers')
+        }
+    },
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/popup.html',
