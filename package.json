@@ -16,7 +16,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@rice-bobb/cluehunter": "^0.0.1",
-    "@xenova/transformers": "^2.17.2"
+    "@huggingface/transformers": "^3.2.4",
+    "@rice-bobb/cluehunter": "^0.0.3"
   }
 }

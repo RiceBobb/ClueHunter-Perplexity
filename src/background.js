@@ -1,5 +1,5 @@
 import { clueHunt } from "@rice-bobb/cluehunter";
-import { env } from "@xenova/transformers";
+import { env } from "@huggingface/transformers";
 
 // Due to a bug in onnxruntime-web, we must disable multithreading for now.
 // See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
@@ -45,7 +45,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (recent && compareURLs(recent.url, currentUrl)) {
           const parsedText = message.data.text;
           const answer = recent.answer;
-          const highlightedText = await clueHunt(answer, parsedText);
+          console.log("Start ClueHunt");
+          console.time("ClueHunt");
+          const highlightedText = await clueHunt(answer, parsedText, 30, "webgpu");
+          console.timeEnd("ClueHunt");
 
           chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.tabs.sendMessage(tabs[0].id, {
@@ -62,15 +65,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 function compareURLs(url1, url2) {
   const parseURL = (urlString) => {
     // Remove protocol if exists
-    const withoutProtocol = urlString.replace(/^(?:https?:)?(?:\/\/)?/, '');
-    
+    const withoutProtocol = urlString.replace(/^(?:https?:)?(?:\/\/)?/, "");
+
     // Split into hostname and path
-    const [hostname, ...pathParts] = withoutProtocol.split('/');
-    const path = pathParts.length > 0 ? '/' + pathParts.join('/') : '/';
-    
+    const [hostname, ...pathParts] = withoutProtocol.split("/");
+    const path = pathParts.length > 0 ? "/" + pathParts.join("/") : "/";
+
     return {
-      hostname: hostname.replace(/^www\./, ''),
-      pathname: path.replace(/\/$/, '')
+      hostname: hostname.replace(/^www\./, ""),
+      pathname: path.replace(/\/$/, ""),
     };
   };
 
