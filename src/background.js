@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const answer = recent.answer;
           console.log("Start ClueHunt");
           console.time("ClueHunt");
-          const highlightedText = await clueHunt(answer, parsedText);
+          const highlightedText = await clueHunt(answer, parsedText, 30, "webgpu");
           console.timeEnd("ClueHunt");
 
           chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
