@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "@huggingface/transformers": "^3.2.4",
-    "@rice-bobb/cluehunter": "^0.0.5"
+    "@rice-bobb/cluehunter": "^0.0.6"
   }
 }
