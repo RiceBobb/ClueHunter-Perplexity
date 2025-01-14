@@ -1,9 +1,16 @@
-import { clueHunt } from "@rice-bobb/cluehunter";
+import { ClueHunter } from "@rice-bobb/cluehunter";
 import { env } from "@huggingface/transformers";
 
 // Due to a bug in onnxruntime-web, we must disable multithreading for now.
 // See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
 env.backends.onnx.wasm.numThreads = 1;
+
+const clueHunt = new ClueHunter(
+  "jinaai/jina-reranker-v1-tiny-en",
+  "webgpu",
+  30,
+  []
+);
 
 chrome.webRequest.onCompleted.addListener(
   (details) => {
@@ -47,13 +54,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const answer = recent.answer;
           console.log("Start ClueHunt");
           console.time("ClueHunt");
-          const highlightedText = await clueHunt(answer, parsedText, 30, "webgpu");
+          const highlightedText = await clueHunt.huntingClues(
+            answer,
+            parsedText
+          );
           console.timeEnd("ClueHunt");
 
           chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.tabs.sendMessage(tabs[0].id, {
               action: "highlightCitation",
-              data: highlightedText,
+              data: highlightedText.trim(),
             });
           });
         }

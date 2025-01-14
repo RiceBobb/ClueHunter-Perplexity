@@ -7,25 +7,25 @@ const TOAST_HTML = `<div id="toast" class="toast">
 
 function showToast(message, duration = 3000) {
   // Create toast element
-  const container = document.createElement('div');
+  const container = document.createElement("div");
   container.innerHTML = TOAST_HTML;
   const toast = container.firstElementChild; // Get the toast div
-  
+
   // Set message
-  const toastMessage = toast.querySelector('.toast-message');
+  const toastMessage = toast.querySelector(".toast-message");
   toastMessage.textContent = message;
-  
+
   // Add to DOM
   document.body.appendChild(toast);
-  
+
   // Show toast (trigger animation)
   requestAnimationFrame(() => {
-    toast.classList.add('show');
+    toast.classList.add("show");
   });
-  
+
   // Hide and remove after duration
   setTimeout(() => {
-    toast.classList.remove('show');
+    toast.classList.remove("show");
     // Wait for hide animation to complete before removing
     setTimeout(() => {
       document.body.removeChild(toast);
@@ -223,7 +223,7 @@ function highlightText(searchText) {
     if (window.find(searchText)) {
       // Get the range before applying highlight
       const range = sel.getRangeAt(0).cloneRange();
-      document.execCommand("HiliteColor", false, "#FFFF99");
+      document.execCommand("HiliteColor", false, "#32CD32");
       sel.collapseToEnd();
       document.designMode = "off";
       return range;
