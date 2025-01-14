@@ -10,23 +10,18 @@
     "storage",
     "unlimitedStorage",
     "tabs",
-    "webRequest"
+    "webRequest",
+    "host_permissions"
   ],
-  "host_permissions": [
-    "*://*.perplexity.ai/*"
-  ],
+  "host_permissions": ["*://*.perplexity.ai/*"],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
       "css": ["content.css"]
     }
   ],
