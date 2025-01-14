@@ -223,7 +223,7 @@ function highlightText(searchText) {
     if (window.find(searchText)) {
       // Get the range before applying highlight
       const range = sel.getRangeAt(0).cloneRange();
-      document.execCommand("HiliteColor", false, "blue");
+      document.execCommand("HiliteColor", false, "#FFFF99");
       sel.collapseToEnd();
       document.designMode = "off";
       return range;
