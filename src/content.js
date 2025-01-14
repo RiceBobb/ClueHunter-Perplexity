@@ -1,3 +1,38 @@
+const TOAST_HTML = `<div id="toast" class="toast">
+        <div class="toast-content">
+            <div class="toast-icon">!</div>
+            <div class="toast-message">Highlighting in the webpage has failed</div>
+        </div>
+    </div>`;
+
+function showToast(message, duration = 3000) {
+  // Create toast element
+  const container = document.createElement('div');
+  container.innerHTML = TOAST_HTML;
+  const toast = container.firstElementChild; // Get the toast div
+  
+  // Set message
+  const toastMessage = toast.querySelector('.toast-message');
+  toastMessage.textContent = message;
+  
+  // Add to DOM
+  document.body.appendChild(toast);
+  
+  // Show toast (trigger animation)
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
+  
+  // Hide and remove after duration
+  setTimeout(() => {
+    toast.classList.remove('show');
+    // Wait for hide animation to complete before removing
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 300); // matches CSS transition duration
+  }, duration);
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "highlightCitation") {
     console.log("Highlighting citation:", message.data);
@@ -5,6 +40,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (range) {
       scrollToRange(range);
     } else {
+      showToast("Highlighting failed", 10000);
       console.log("Perplexity ClueHunter : The highlight failed...");
     }
   }
