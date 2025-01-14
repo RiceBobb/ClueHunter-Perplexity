@@ -2,17 +2,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "highlightCitation") {
     console.log("Highlighting citation:", message.data);
     const range = highlightText(message.data);
-    scrollToRange(range);
+    if (range) {
+      scrollToRange(range);
+    } else {
+      console.log("Perplexity ClueHunter : The highlight failed...");
+    }
   }
 });
 
 chrome.runtime.sendMessage({
-    action: "webPageLoaded",
-    data: {
-      url: window.location.href,
-      text: document.body.innerText,
-    },
-  });
+  action: "webPageLoaded",
+  data: {
+    url: window.location.href,
+    text: document.body.innerText,
+  },
+});
 
 document.addEventListener("click", handleClick, true);
 
@@ -27,56 +31,56 @@ function getSessionName(url) {
 
 function handleClick(event) {
   if (isPerplexity(window.location.href)) {
-  const clickedElement = event.target;
-  let answer = "";
-  if (isCitation(clickedElement)) {
-    // When the element is Citation, we need to extract the answer and citation
-    const tempSpan = clickedElement.parentNode.parentNode.parentNode;
-    let initialCitationSpan;
-    if (
-      tempSpan.classList &&
-      tempSpan.classList.contains("whitespace-nowrap")
-    ) {
-      initialCitationSpan = tempSpan.parentNode;
-    } else {
-      initialCitationSpan = tempSpan;
-    }
-    console.log("Initial Citation Span:", initialCitationSpan);
-    let i = -1;
-    while (true) {
-      const previousSibling = getNthSibling(initialCitationSpan, i);
-      const extractedResult = extractSpan(previousSibling);
-      if (extractedResult.type === spanTypes.SENTENCE) {
-        answer = extractedResult.value;
-        break;
+    const clickedElement = event.target;
+    let answer = "";
+    if (isCitation(clickedElement)) {
+      // When the element is Citation, we need to extract the answer and citation
+      const tempSpan = clickedElement.parentNode.parentNode.parentNode;
+      let initialCitationSpan;
+      if (
+        tempSpan.classList &&
+        tempSpan.classList.contains("whitespace-nowrap")
+      ) {
+        initialCitationSpan = tempSpan.parentNode;
+      } else {
+        initialCitationSpan = tempSpan;
       }
-      i--;
+      console.log("Initial Citation Span:", initialCitationSpan);
+      let i = -1;
+      while (true) {
+        const previousSibling = getNthSibling(initialCitationSpan, i);
+        const extractedResult = extractSpan(previousSibling);
+        if (extractedResult.type === spanTypes.SENTENCE) {
+          answer = extractedResult.value;
+          break;
+        }
+        i--;
+      }
     }
+
+    // Get element details
+    const elementInfo = {
+      tag: clickedElement.tagName,
+      text: clickedElement.textContent,
+      href: getHref(clickedElement),
+      coordinates: {
+        x: event.clientX,
+        y: event.clientY,
+        pageX: event.pageX,
+        pageY: event.pageY,
+      },
+      xpath: getXPath(clickedElement),
+      currentUrl: window.location.href,
+      isCitation: isCitation(clickedElement),
+      answer: answer,
+    };
+
+    // Send to background script
+    chrome.runtime.sendMessage({
+      action: "elementClicked",
+      data: elementInfo,
+    });
   }
-
-  // Get element details
-  const elementInfo = {
-    tag: clickedElement.tagName,
-    text: clickedElement.textContent,
-    href: getHref(clickedElement),
-    coordinates: {
-      x: event.clientX,
-      y: event.clientY,
-      pageX: event.pageX,
-      pageY: event.pageY,
-    },
-    xpath: getXPath(clickedElement),
-    currentUrl: window.location.href,
-    isCitation: isCitation(clickedElement),
-    answer: answer,
-  };
-
-  // Send to background script
-  chrome.runtime.sendMessage({
-    action: "elementClicked",
-    data: elementInfo,
-  });
-}
 }
 
 function isCitation(element) {
@@ -179,13 +183,18 @@ function highlightText(searchText) {
     document.designMode = "on";
     var sel = window.getSelection();
     sel.collapse(document.body, 0);
-    
-    while (window.find(searchText)) {
+
+    if (window.find(searchText)) {
+      // Get the range before applying highlight
+      const range = sel.getRangeAt(0).cloneRange();
       document.execCommand("HiliteColor", false, "blue");
       sel.collapseToEnd();
+      document.designMode = "off";
+      return range;
     }
     document.designMode = "off";
   }
+  return null;
 }
 
 function scrollToRange(range) {
@@ -193,7 +202,7 @@ function scrollToRange(range) {
     const rect = range.getBoundingClientRect();
     window.scrollTo({
       top: rect.top + window.pageYOffset - 100,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   }
 }
