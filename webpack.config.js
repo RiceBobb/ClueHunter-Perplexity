@@ -48,6 +48,10 @@ const config = {
           from: "src/popup.css",
           to: "popup.css",
         },
+        {
+          from: "src/content.css",
+          to: "content.css",
+        },
       ],
     }),
   ],

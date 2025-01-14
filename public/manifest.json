@@ -26,7 +26,8 @@
       ],
       "js": [
         "content.js"
-      ]
+      ],
+      "css": ["content.css"]
     }
   ],
   "minimum_chrome_version": "92",
