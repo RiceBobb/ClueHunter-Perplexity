@@ -1,7 +1,7 @@
 # ClueHunter-Perplexity
 Open Source Chrome Extension that detects clue of Perplexity answer at the cited webpage.
 
-![Havertz](https://github.com/user-attachments/assets/4f446e3e-d237-458c-a39d-740515cb6a1d)
+<img src=https://github.com/user-attachments/assets/4f446e3e-d237-458c-a39d-740515cb6a1d width="251.5" height="55.2"/>
 
 ## Getting Started
 1. Clone the repo and enter the project directory:
