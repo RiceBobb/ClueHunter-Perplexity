@@ -5,11 +5,8 @@
   "version": "0.0.1",
   "permissions": [
     "activeTab",
-    "scripting",
-    "contextMenus",
     "storage",
     "unlimitedStorage",
-    "tabs",
     "webRequest",
     "host_permissions"
   ],
