@@ -1,6 +1,8 @@
 # ClueHunter-Perplexity
 Open Source Chrome Extension that detects clue of Perplexity answer at the cited webpage.
 
+## [**Download Now**](https://chromewebstore.google.com/detail/cluehunter-perplexity/mhkmlamlmdlkgpmfgbdnhohbggldekjf)
+
 https://github.com/user-attachments/assets/4f446e3e-d237-458c-a39d-740515cb6a1d
 
 ## Getting Started
